@@ -29,6 +29,15 @@
     return _brain;
 }
 
+// Instance Method to create the history by calling the DescriptionOfProgram method in the brain
+// The method checks the contents of the stack and reverses the order of the input to make it a standard notation
+// rather than the reverse polish logic
+
+- (void)UpdateHistory
+{
+    self.history.text = [CalculatorBrain descriptionOfProgram:[self.brain program]];
+}
+
 - (IBAction)clearPressed
 {
     self.display.text =@"0";
@@ -38,7 +47,9 @@
     [self.brain clearBrain];
 
 }
-
+// A single digit is pressed and will appear in the display
+// if the display already has information the new digit will
+// be appended.
 - (IBAction)digitPressed:(UIButton *)sender
 {
     NSString *digit = [sender currentTitle];
@@ -54,14 +65,20 @@
         self.userIsInTheMiddleOfEnteringANumber = YES;
     }
 }
+
+// When enter is pressed the Operand is added to the stack and the history - description of the program gets updated
+
 - (IBAction)enterPressed
 {
-    if ([self.history.text hasSuffix:@"="]) {
-        self.history.text = [self.history.text substringToIndex:[self.history.text length]-1];
-        self.history.text = [self.history.text stringByAppendingString:@" "]; 
-    }
-    self.history.text = [self.history.text stringByAppendingString:self.display.text];
-    self.history.text = [self.history.text stringByAppendingString:@" "];
+
+// original code for updating history, changed to call the UpdateHistory method
+//    if ([self.history.text hasSuffix:@"="]) {
+//        self.history.text = [self.history.text substringToIndex:[self.history.text length]-1];
+//        self.history.text = [self.history.text stringByAppendingString:@" "]; 
+//    }
+//    self.history.text = [self.history.text stringByAppendingString:self.display.text];
+//    self.history.text = [self.history.text stringByAppendingString:@" "];
+    //[self UpdateHistory];
     [self.brain pushOperand:[self.display.text doubleValue]];
     self.userIsInTheMiddleOfEnteringANumber = NO;
     self.userHasEnteredADecimalPoint = NO;
@@ -109,19 +126,21 @@
 - (IBAction)operationPressed:(UIButton *)sender
 {
     if (self.userIsInTheMiddleOfEnteringANumber) [self enterPressed];
-    if ([self.history.text hasSuffix:@"="]) {
-        self.history.text = [self.history.text substringToIndex:[self.history.text length]-1];
-        self.history.text = [self.history.text stringByAppendingString:@" "];
-    }
-
-    self.history.text = [self.history.text stringByAppendingString:sender.currentTitle];
+    //if ([self.history.text hasSuffix:@"="]) {
+    //    self.history.text = [self.history.text substringToIndex:[self.history.text length]-1];
+    //    self.history.text = [self.history.text stringByAppendingString:@" "];
+    //}
+    // only update the history when a complete expression has been entered
+    // self.history.text = [self.history.text stringByAppendingString:sender.currentTitle];
+    [self.brain pushOperatorOrVariable:sender.currentTitle];
+    [self UpdateHistory];
     double result = [self.brain performOperation:sender.currentTitle];
     NSString *resultString = [NSString stringWithFormat:@"%g", result];
     self.display.text = resultString;
     
-    if (![self.history.text hasSuffix:@"="]) {
-        self.history.text = [self.history.text stringByAppendingString:@"="];
-    }
+    //if (![self.history.text hasSuffix:@"="]) {
+    //    self.history.text = [self.history.text stringByAppendingString:@"="];
+    //}
 /*    NSString *operation = [sender currentTitle];
     double result = [self.brain performOperation:operation];
     self.display.text = [NSString stringWithFormat:@"%g", result];
