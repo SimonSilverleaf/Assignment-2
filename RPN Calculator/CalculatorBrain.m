@@ -63,7 +63,7 @@
         while (stack.count >0){
             result = [result stringByAppendingFormat:@"%@, ", [CalculatorBrain descriptionOfTopStack:&stack]];
         }
-        return result;
+        return result;  
     }
 // see sections 3 and 6 from assignment @
     
